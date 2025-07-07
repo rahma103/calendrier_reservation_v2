@@ -1,0 +1,105 @@
+ <!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Connexion</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <style>
+    body {
+      background-color: #f0f4f8;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .login-container {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .login-container img {
+      width: 100px;
+      margin-bottom: 20px;
+    }
+
+    .login-container h2 {
+      margin-bottom: 20px;
+      color: #0a9396;
+    }
+
+    .login-container input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    .login-container button {
+      display: none;
+      margin-top: 15px;
+      background-color: #0a9396;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .login-container button:hover {
+      background-color: #007b7f;
+    }
+
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <!-- Image personnalisée -->
+    <img src="/static/logo.png" alt="Logo" />
+
+    <h2>Bienvenue à la Plateforme de Réservation</h2>
+
+    <form method="POST">
+      <input type="text" id="username" name="username" placeholder="Nom d'utilisateur" required />
+      <input type="password" id="password" name="password" placeholder="Mot de passe" required />
+      <button type="submit" id="btnLogin">Se connecter</button>
+    </form>
+
+    {% if error %}
+      <p class="error">{{ error }}</p>
+    {% endif %}
+  </div>
+
+  <script>
+    const username = document.getElementById("username");
+    const password = document.getElementById("password");
+    const btnLogin = document.getElementById("btnLogin");
+
+    function checkInput() {
+      if (username.value.trim() !== "" && password.value.trim() !== "") {
+        btnLogin.style.display = "inline-block";
+      } else {
+        btnLogin.style.display = "none";
+      }
+    }
+
+    username.addEventListener("input", checkInput);
+    password.addEventListener("input", checkInput);
+  </script>
+</body>
+</html>

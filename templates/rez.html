@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rez-de-chaussée - Maison 1</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+  <h2>Rez-de-chaussée – Maison 1</h2>
+  <div class="calendar-group">
+    <div class="calendar-box">
+      <h3>Juin 2025</h3>
+      <div class="calendar" data-maison="maison1" data-niveau="rez" data-mois="6"></div>
+    </div>
+    <div class="calendar-box">
+      <h3>Juillet 2025</h3>
+      <div class="calendar" data-maison="maison1" data-niveau="rez" data-mois="7"></div>
+    </div>
+    <div class="calendar-box">
+      <h3>Août 2025</h3>
+      <div class="calendar" data-maison="maison1" data-niveau="rez" data-mois="8"></div>
+    </div>
+    <div class="calendar-box">
+      <h3>Septembre 2025</h3>
+      <div class="calendar" data-maison="maison1" data-niveau="rez" data-mois="9"></div>
+    </div>
+  </div>
+
+  <button id="btnReserveSelected" disabled>Réserver les dates sélectionnées</button>
+
+  <form id="reservationForm" class="reservation-form" style="display:none;">
+    <fieldset>
+      <legend>📅 Confirmer la réservation</legend>
+
+      <label for="nomPrenom">👤 Nom & Prénom</label>
+      <input type="text" id="nomPrenom" name="nomPrenom" placeholder="Ex: Rahma Abdelmoula" required />
+
+      <label for="telephone">📞 Téléphone</label>
+      <input type="tel" id="telephone" name="telephone" placeholder="Ex: +216 99 999 999" required />
+
+      <button type="submit" class="btn-reserver">✅ Réserver</button>
+      <button type="button" id="btnCancel" class="btn-cancel">Annuler</button>
+    </fieldset>
+  </form>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
