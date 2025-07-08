@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import os
 
 app = Flask(__name__)
-app.secret_key = 'ma_cle_secrete_a_changer'  # Nécessaire pour les sessions
+app.secret_key = '568df7afbab7ea26d1cf8e4ffdd5164ff6e18f57db6f83d68ba3d367b6a14d8c'  # à personnaliser !
 
 FICHIER_RESERVATIONS = "static/reservations.json"
 
@@ -33,11 +33,9 @@ def traduire_date_id(date_id):
     maison, niveau, mois, jour = parts
     mois_nom = ["", "janvier", "février", "mars", "avril", "mai", "juin",
                 "juillet", "août", "septembre", "octobre", "novembre", "décembre"]
-    mois_int = int(mois)
-    jour_int = int(jour)
-    return f"{jour_int} {mois_nom[mois_int]} 2025 - {niveau} - {maison}"
+    return f"{int(jour)} {mois_nom[int(mois)]} 2025 - {niveau} - {maison}"
 
-# -------------------- ROUTES LOGIN --------------------
+# -------------------- ROUTES AUTH --------------------
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -47,8 +45,7 @@ def login():
         if username in USERS and USERS[username] == password:
             session['user'] = username
             return redirect(url_for('accueil'))
-        else:
-            return render_template("login.html", error="Identifiants incorrects.")
+        return render_template("login.html", error="Identifiants incorrects.")
     return render_template("login.html")
 
 @app.route('/logout')
@@ -56,62 +53,57 @@ def logout():
     session.pop('user', None)
     return redirect(url_for('login'))
 
-# -------------------- ROUTES PRINCIPALES --------------------
+# -------------------- ROUTES PAGES --------------------
 
-@app.route("/")
+@app.route('/')
 def accueil():
     if 'user' not in session:
         return redirect(url_for('login'))
-    return render_template("accueil.html")
+    return render_template('accueil.html')
 
-@app.route("/rez")
+@app.route('/rez')
 def rez_de_chaussee():
     if 'user' not in session:
         return redirect(url_for('login'))
-    return render_template("rez.html")
+    return render_template('rez.html')
 
-@app.route("/etage1")
+@app.route('/etage1')
 def etage1():
     if 'user' not in session:
         return redirect(url_for('login'))
-    return render_template("etage1.html")
+    return render_template('etage1.html')
 
-@app.route("/etage2")
+@app.route('/etage2')
 def etage2():
     if 'user' not in session:
         return redirect(url_for('login'))
-    return render_template("etage2.html")
+    return render_template('etage2.html')
 
-@app.route("/liste")
+@app.route('/liste')
 def liste_reservations():
     if 'user' not in session:
         return redirect(url_for('login'))
     reservations = load_reservations()
-    formatted = {}
-    for date, info in reservations.items():
-        formatted[traduire_date_id(date)] = {
-            "nom": info.get("nom", ""),
-            "prenom": info.get("prenom", ""),
-            "telephone": info.get("telephone", "")
-        }
-    return render_template("liste.html", reservations=formatted)
+    formatted = {
+        traduire_date_id(date): info for date, info in reservations.items()
+    }
+    return render_template('liste.html', reservations=formatted)
 
-@app.route("/telecharger")
+@app.route('/telecharger')
 def telecharger_reservations():
     if 'user' not in session:
         return redirect(url_for('login'))
     if os.path.exists(FICHIER_RESERVATIONS):
         return send_file(FICHIER_RESERVATIONS, as_attachment=True)
-    else:
-        return "Aucun fichier de réservation disponible.", 404
+    return "Fichier non trouvé", 404
 
-@app.route("/reserver", methods=["POST"])
+# -------------------- ROUTE POST RESERVATION --------------------
+
+@app.route('/reserver', methods=['POST'])
 def reserver():
     data = request.get_json()
     if not data:
         return jsonify(success=False, message="Données manquantes")
-
-    reservations = load_reservations()
 
     start_str = data.get("startDate")
     end_str = data.get("endDate", start_str)
@@ -121,37 +113,35 @@ def reserver():
     telephone = data.get("telephone", "").strip()
 
     if not (start_str and nom_prenom and telephone):
-        return jsonify(success=False, message="Champs obligatoires manquants")
+        return jsonify(success=False, message="Champs requis manquants")
 
     nom, prenom = "", ""
     parts = nom_prenom.split()
-    if len(parts) == 1:
-        nom = parts[0]
-    elif len(parts) >= 2:
-        nom = parts[-1]
+    if len(parts) >= 2:
         prenom = " ".join(parts[:-1])
+        nom = parts[-1]
+    else:
+        nom = nom_prenom
 
     try:
         start_date = datetime.strptime(start_str, "%Y-%m-%d").date()
         end_date = datetime.strptime(end_str, "%Y-%m-%d").date()
     except ValueError:
-        return jsonify(success=False, message="Format date invalide")
+        return jsonify(success=False, message="Format de date invalide")
 
     if end_date < start_date:
         return jsonify(success=False, message="Date de fin antérieure à la date de début")
 
+    reservations = load_reservations()
     delta = (end_date - start_date).days
     dates_ids = []
+
     for i in range(delta + 1):
         current_date = start_date + timedelta(days=i)
-        mois = current_date.month
-        jour = current_date.day
-        date_id = f"{maison}-{niveau}-{mois}-{jour}"
-        dates_ids.append(date_id)
-
-    for date_id in dates_ids:
+        date_id = f"{maison}-{niveau}-{current_date.month}-{current_date.day}"
         if date_id in reservations:
             return jsonify(success=False, message=f"Date déjà réservée : {traduire_date_id(date_id)}")
+        dates_ids.append(date_id)
 
     for date_id in dates_ids:
         reservations[date_id] = {
@@ -159,16 +149,11 @@ def reserver():
             "nom": nom,
             "telephone": telephone
         }
+
     save_reservations(reservations)
     return jsonify(success=True)
 
-# -------------------- DÉMARRAGE --------------------
-
+# -------------------- DEMARRAGE LOCAL --------------------
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)
-
-
-
-
-
