@@ -22,7 +22,7 @@
     .btn, .btn-secondary {
       display: inline-block;
       padding: 10px 20px;
-      margin: 10px 0;
+      margin: 10px 10px;
       text-decoration: none;
       background-color: #0a9396;
       color: white;
@@ -33,6 +33,14 @@
     .btn:hover, .btn-secondary:hover {
       background-color: #94d2bd;
       color: #222;
+    }
+
+    .btn-danger {
+      background-color: #d00000;
+    }
+
+    .btn-danger:hover {
+      background-color: #ff595e;
     }
 
     .reservation-table {
@@ -62,6 +70,7 @@
 
     .center {
       text-align: center;
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -70,6 +79,11 @@
 
   <div class="center">
     <a href="/telecharger" class="btn btn-secondary">📥 Télécharger le fichier JSON</a>
+
+    <!-- Formulaire pour supprimer toutes les réservations -->
+    <form method="POST" action="/vider_reservations" onsubmit="return confirm('Confirmer la suppression de toutes les réservations ?');" style="display: inline;">
+      <button class="btn btn-danger" type="submit">🗑️ Supprimer toutes les réservations</button>
+    </form>
   </div>
 
   {% if reservations %}

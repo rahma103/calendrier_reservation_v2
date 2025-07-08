@@ -10,7 +10,7 @@ FICHIER_RESERVATIONS = "static/reservations.json"
 
 # --- Données utilisateurs
 USERS = {
-    "rafraf": "projet2023",
+    "rafraf": "ete2025",
     "rahma": "motdepasse"
 }
 
@@ -96,6 +96,22 @@ def telecharger_reservations():
     if os.path.exists(FICHIER_RESERVATIONS):
         return send_file(FICHIER_RESERVATIONS, as_attachment=True)
     return "Fichier non trouvé", 404
+
+
+@app.route("/vider_reservations", methods=["POST"])
+def vider_reservations():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    if os.path.exists(FICHIER_RESERVATIONS):
+        with open(FICHIER_RESERVATIONS, "w", encoding="utf-8") as f:
+            f.write("{}")  # Réinitialiser à un JSON vide
+    return redirect(url_for('liste_reservations'))
+
+
+
+
+
 
 # -------------------- ROUTE POST RESERVATION --------------------
 
